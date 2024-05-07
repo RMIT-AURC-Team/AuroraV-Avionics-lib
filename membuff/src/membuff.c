@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "membuff.h"
 
 void MemBuff_init(MemBuff* mem, uint8_t* buff, int buffSize, int pageSize) {
@@ -54,7 +55,22 @@ void MemBuff_append(MemBuff* mem, uint8_t data) {
   mem->length++;
 }
 
-void MemBuff_flush(MemBuff* mem) {
+void MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
+  // Early exit if nothing to flush
+  if (mem->length == 0)
+    return NULL;
+
+  // Copy data from page window to output buffer
+  if (mem->head < mem->tail) {
+    // If page window is within the buffer 
+    memcpy(outBuff, mem->head, mem->pageSize);
+  } else {
+    // If page window overflows buffer
+    int diff = (int)(mem->buffEnd - mem->head);
+    memcpy(outBuff, mem->head, diff);                         // Copy in data from head to end of buffer
+    memcpy(outBuff + diff, mem->buff, mem->pageSize - diff);  // Copy in data from start of buffer to tail
+  }
+
   // Slide head to next page window
   if (mem->length >= mem->pageSize) {
     // If cell has overflowed page window
