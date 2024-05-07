@@ -16,8 +16,8 @@ uint8_t buffer_data[16]; // Buffer data storage
 int buffer_size = sizeof(buffer_data);
 int page_size = 4;
 
-MemBuff my_buffer;
-MemBuff_init(&my_buffer, buffer_data, buffer_size, page_size);
+MemBuff mem;
+mem.init(&mem, buffer_data, buffer_size, page_size);
 
 ```
 
@@ -27,7 +27,7 @@ Use `MemBuff_append` to add data to the buffer. It automatically handles wrappin
 
 ```C
 for (int i = 0; i < 10; i++) {
-  MemBuff_append(&my_buffer, i);
+  mem.append(&mem, i);
 }
 ```
 
@@ -36,7 +36,7 @@ for (int i = 0; i < 10; i++) {
 Use `MemBuff_flush` to discard data in the current page window and move the window forward. This is useful when you want to start writing fresh data (i.e. after writing to flash).
 
 ```C
-MemBuff_flush(&my_buffer);
+mem.flush(&mem);
 ```
 
 **5. Erase data:**
@@ -44,9 +44,9 @@ MemBuff_flush(&my_buffer);
 Use `MemBuff_erase` to manually erase a specific range of data within the buffer.
 
 ```C
-MemBuff_erase(&my_buffer, buffer_data + 2, buffer_data + 5); // Erase data from index 2 to 4
+mem.erase(&mem, buffer_data + 2, buffer_data + 5); // Erase data from index 2 to 4
 ```
 
 **Additional features:**
 
--   `my_buffer.length`: Provides the current length of data in the buffer.
+-   `mem.length`: Provides the current length of data in the buffer.
