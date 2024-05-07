@@ -11,7 +11,7 @@ void MemBuff_init(MemBuff* mem, uint8_t* buff, int buffSize, int pageSize) {
   mem->head = mem->buff;                    // Initialise head at buff[0] 
   mem->cell = mem->head;                    // Initialise cell pointer at head
   mem->tail = mem->head + mem->pageSize-1;  // Initialise tail incremented a page length from head
-  mem->buffEnd = mem->buff + mem->buffSize-1;
+  mem->buffEnd = mem->buff + mem->buffSize;
 
   mem->_slide = _MemBuff_slide;
 
