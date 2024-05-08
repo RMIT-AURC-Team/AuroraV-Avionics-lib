@@ -11,7 +11,7 @@ typedef struct MemBuff {
   int buffSize;
   int length; 
   void (*_slide)(struct MemBuff*, uint8_t*);
-  void (*flush)(struct MemBuff*, uint8_t*);
+  bool (*flush)(struct MemBuff*, uint8_t*);
   void (*append)(struct MemBuff*, uint8_t);
   void (*erase)(struct MemBuff*, uint8_t*, uint8_t*);
 } MemBuff;
@@ -19,7 +19,7 @@ typedef struct MemBuff {
 void _MemBuff_slide(MemBuff*, uint8_t*);
 
 void MemBuff_init(MemBuff*, uint8_t*, int, int);
-void MemBuff_flush(MemBuff*, uint8_t*);
+bool MemBuff_flush(MemBuff*, uint8_t*);
 void MemBuff_append(MemBuff*, uint8_t);
 void MemBuff_erase(struct MemBuff*, uint8_t*, uint8_t*);
 

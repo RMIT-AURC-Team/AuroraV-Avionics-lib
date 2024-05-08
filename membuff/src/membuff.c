@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -55,11 +56,10 @@ void MemBuff_append(MemBuff* mem, uint8_t data) {
   mem->length++;
 }
 
-void MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
-  // Output null end return if nothing to flush
+bool MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
+  // Nullify and early exit if nothing to flush
   if (mem->length == 0) {
-    outBuff = NULL;
-    return;
+    return false;
   }
 
   // Copy data from page window to output buffer
@@ -87,6 +87,7 @@ void MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
 
   // Erase page window from current cell onward
   mem->erase(mem, mem->cell, mem->tail);
+  return true;
 }
 
 void MemBuff_erase(MemBuff* mem, uint8_t* start, uint8_t* end) {
