@@ -33,10 +33,11 @@ for (int i = 0; i < 10; i++) {
 
 **4. Flush buffer:**
 
-Use `MemBuff_flush` to discard data in the current page window and move the window forward. This is useful when you want to start writing fresh data (i.e. after writing to flash).
+Use `MemBuff_flush` to write out data from current page window into output buffer and slide window forward. This is useful when you want to start writing fresh data (i.e. after writing to flash).
 
 ```C
-mem.flush(&mem);
+uint8_t outBuff[mem.pageSize]
+mem.flush(&mem, outBuff);
 ```
 
 **5. Erase data:**

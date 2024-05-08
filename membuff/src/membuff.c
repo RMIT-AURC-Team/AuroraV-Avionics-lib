@@ -56,30 +56,31 @@ void MemBuff_append(MemBuff* mem, uint8_t data) {
 }
 
 void MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
-  // Early exit if nothing to flush
+  // Output null if nothing to flush
   if (mem->length == 0)
-    return NULL;
+    outBuff = NULL;
 
   // Copy data from page window to output buffer
   if (mem->head < mem->tail) {
     // If page window is within the buffer 
-    memcpy(outBuff, mem->head, mem->pageSize);
+    memcpy(outBuff, mem->head, mem->pageSize);   // Copy in data from head to tail
   } else {
     // If page window overflows buffer
     int diff = (int)(mem->buffEnd - mem->head);
-    memcpy(outBuff, mem->head, diff);                         // Copy in data from head to end of buffer
-    memcpy(outBuff + diff, mem->buff, mem->pageSize - diff);  // Copy in data from start of buffer to tail
+    int startDiff = mem->pageSize - diff;
+    memcpy(outBuff, mem->head, diff);             // Copy in data from head to end of buffer
+    memcpy(outBuff + diff, mem->buff, startDiff); // Copy in data from start of buffer to tail
   }
 
   // Slide head to next page window
   if (mem->length >= mem->pageSize) {
     // If cell has overflowed page window
-    mem->_slide(mem, (mem->head + mem->pageSize));  // Push head and tail forward a page length
-    mem->length = (mem->cell - mem->head);          // Calculate new length from cell overflow
+    mem->_slide(mem, (mem->head + mem->pageSize)); // Push head and tail forward a page length
+    mem->length = (mem->cell - mem->head);         // Calculate new length from cell overflow
   } else {
     // If cell is still within page window
-    mem->_slide(mem, mem->cell);                    // Push head and tail forward to start at current cell
-    mem->length = 0;                                // Reset length to 0
+    mem->_slide(mem, mem->cell);                   // Push head and tail forward to start at current cell
+    mem->length = 0;                               // Reset length to 0
   }
 
   // Erase page window from current cell onward

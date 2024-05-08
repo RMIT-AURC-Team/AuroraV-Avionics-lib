@@ -12,7 +12,13 @@ int main() {
       printf("Current head: %p\t", mem.head);
       printf("Current cell: %p\t", mem.cell);
       printf("Current tail: %p\n", mem.tail);
-      mem.flush(&mem);
+
+      uint8_t flush[mem.pageSize];
+      mem.flush(&mem, flush);
+      for(int j = 0; j < sizeof(flush); j++)
+          printf("%d ", flush[j]);
+
+      printf("\n");
       printf("New head: %p\t", mem.head);
       printf("New cell: %p\t", mem.cell);
       printf("New tail: %p\n", mem.tail);
