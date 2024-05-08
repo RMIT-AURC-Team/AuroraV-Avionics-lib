@@ -56,9 +56,11 @@ void MemBuff_append(MemBuff* mem, uint8_t data) {
 }
 
 void MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
-  // Output null if nothing to flush
-  if (mem->length == 0)
+  // Output null end return if nothing to flush
+  if (mem->length == 0) {
     outBuff = NULL;
+    return;
+  }
 
   // Copy data from page window to output buffer
   if (mem->head < mem->tail) {
