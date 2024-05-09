@@ -24,23 +24,24 @@ void MemBuff_init(MemBuff* mem, uint8_t* buff, int buffSize, int pageSize) {
 
 /******************** INTERNAL INTERFACE ********************/
 void _MemBuff_slide(MemBuff* mem, uint8_t* newHead) {
+  int pageEnd = mem->pageSize - 1;
   bool headOverflow = (newHead >= mem->buffEnd);
-  bool tailOverflow = (newHead + mem->pageSize) >= mem->buffEnd;
+  bool tailOverflow = (newHead + pageEnd) >= mem->buffEnd;
 
   if (headOverflow) {
     // If head extends beyond the buffer
     int diff = (int)(newHead - mem->buffEnd);
     mem->head = mem->buff + diff;           // New head loops back difference from start of buffer
-    mem->tail = mem->head + mem->pageSize;  // New tail is simply a page length increment from new head
+    mem->tail = mem->head + pageEnd;        // New tail is simply a page length increment from new head
   } else if (tailOverflow) {
     // If tail extends beyond the buffer
-    int diff = (int)((newHead + mem->pageSize) - mem->buffEnd);
+    int diff = (int)((newHead + pageEnd) - mem->buffEnd);
     mem->head = newHead;                    // New head is simply the passed pointer
     mem->tail = mem->buff + diff;           // New tail loops back difference from start of buffer
   } else {
     // Base case
     mem->head = newHead;
-    mem->tail = newHead + mem->pageSize;
+    mem->tail = newHead + pageEnd;
   }
 }
 
