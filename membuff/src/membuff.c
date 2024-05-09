@@ -16,13 +16,16 @@ void MemBuff_init(MemBuff* mem, uint8_t* buff, int buffSize, int pageSize) {
   mem->buffEnd = mem->buff + mem->buffSize;
 
   mem->_slide = _MemBuff_slide;
+  mem->pageReady = false;
 
+  mem->readPage = MemBuff_readPage;
   mem->flush = MemBuff_flush;
   mem->append = MemBuff_append;
   mem->erase = MemBuff_erase;
 }
 
 /******************** INTERNAL INTERFACE ********************/
+
 void _MemBuff_slide(MemBuff* mem, uint8_t* newHead) {
   int pageEnd = mem->pageSize - 1;
   bool headOverflow = (newHead >= mem->buffEnd);
@@ -46,6 +49,12 @@ void _MemBuff_slide(MemBuff* mem, uint8_t* newHead) {
 }
 
 /********************* PUBLIC INTERFACE *********************/
+
+/* ===============================================================================
+ * APPEND
+ * - Adds data to the next cell in the internal buffer, handles overflow.
+ * - Increments length after append and sets flag if page window is full;
+ * =============================================================================== */
 void MemBuff_append(MemBuff* mem, uint8_t data) {
   // Circle cell pointer back to start of buffer if past end
   if (mem->cell == mem->buffEnd) {
@@ -54,11 +63,44 @@ void MemBuff_append(MemBuff* mem, uint8_t data) {
 
   *mem->cell = data;
   mem->cell++;
-  mem->length++;
+
+  // Increment length and set ready flag if page window is filled
+  ++mem->length;
+  if (mem->length >= mem->pageSize) {
+    mem->pageReady = true;          
+  }
 }
 
+/* ===============================================================================
+ * READPAGE
+ * - Flushes data to output buffer if page window is ready to be read
+ *    and resets flag.
+ * =============================================================================== */
+bool MemBuff_readPage(MemBuff* mem, uint8_t* outBuff) {
+  // Early exit with false if no page ready
+  if (!mem->pageReady) {
+    return false;
+  }
+
+  // Otherwise reset flag and pass out buffer
+  mem->pageReady = false;
+  mem->flush(mem, outBuff);  // Flush to output buffer
+  return true;
+}
+
+/* ===============================================================================
+ * FLUSH
+ * - Copies out data currently within page window to output buffer and 
+ *    slides page window forward.
+ * - Used by readPage function to handle guarded output, can be used standalone
+ *    for early buffer reads.
+ *
+ * Caution should be taken when calling directly, problems can occur if
+ *    the internal buffer overflows back to the current window. It is recommended 
+ *    to use readPage where possible to flush out the window when full.
+ * =============================================================================== */
 bool MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
-  // Nullify and early exit if nothing to flush
+  // Early exit with false if nothing to flush
   if (mem->length == 0) {
     return false;
   }
@@ -91,10 +133,15 @@ bool MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
   return true;
 }
 
+/* ===============================================================================
+ * ERASE
+ * - Set cells to zero between start and end pointers.
+ * - Used by the flush function to prevent writing out old data to memory.
+ * =============================================================================== */
 void MemBuff_erase(MemBuff* mem, uint8_t* start, uint8_t* end) {
   int diff = (int)(end - start);
   uint8_t* cell = start;
-  for(int i = 0; i < diff; i++) {
+  for(int i = 0; i <= diff; i++) {
     // Loop back to start of buffer on overflow
     if (cell >= mem->buffEnd)
         cell = mem->buff;
