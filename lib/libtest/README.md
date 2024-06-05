@@ -21,7 +21,7 @@ make
 
 This will compile the source files and generate the static library `libtest.a` in the `build` directory.
 
-### Using the Library
+### Usage
 
 To use `libtest` include the `libtest.h` header file and link against the `libtest.a` static library. Here is an example of how to integrate and use `libtest` in a test file:
 
