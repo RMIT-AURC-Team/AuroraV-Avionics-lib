@@ -1,6 +1,6 @@
 # List of subprojects
 ROOT = $(shell pwd)
-SUBPROJECTS = membuff quat
+SUBPROJECTS = membuff quaternion
 LIBTEST_DIR = $(ROOT)/lib/libtest
 LIBTEST_LIB = -L$(LIBTEST_DIR)/build -ltest -I$(LIBTEST_DIR)/src
 
