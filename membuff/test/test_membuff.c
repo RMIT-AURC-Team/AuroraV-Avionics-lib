@@ -178,8 +178,8 @@ int main() {
     test_flush_empty_buffer, test_flush_simple_case, 
     test_flush_wrap_around, test_flush_partial_window, test_flush_overflowed_window
   }; 
-  int numTests = sizeof(tests)/sizeof(tests[0]);
-  test(numTests, tests);
+  int numTests = sizeof(tests)/sizeof(TestFunction);
+  run_tests(numTests, tests);
 
   return 0;
 }

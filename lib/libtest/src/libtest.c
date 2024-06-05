@@ -38,7 +38,7 @@ bool assert_pointer_equals(char* test, uint8_t* point, uint8_t* goalPoint) {
   return point == goalPoint;
 }
 
-void test(int numTests, TestFunction tests[]) {
+void run_tests(int numTests, TestFunction tests[]) {
   int passCount = 0;
   bool result = false;
 
