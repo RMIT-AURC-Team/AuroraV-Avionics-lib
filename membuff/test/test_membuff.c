@@ -2,40 +2,8 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "libtest.h"
 #include "membuff.h"
-
-bool assert(char* test, bool assertion, bool value) {
-  if (test != NULL)
-    printf("Asserting %s\n", test);
-  return assertion == value;
-}
-
-bool assert_buffer_equals(char* test, uint8_t* buff, uint8_t* goalBuff, int buffSize) {
-  if (test != NULL)
-    printf("Asserting %s\n", test);
-
-  printf("Test buffer:\t ");
-  for(int i = 0; i < buffSize; i++)
-    printf("%d ", buff[i]);
-  printf("\n");
-
-  printf("Goal buffer:\t ");
-  for(int i = 0; i < buffSize; i++)
-    printf("%d ", goalBuff[i]);
-  printf("\n\n");
-
-  return memcmp(buff, goalBuff, buffSize) ? 0 : 1; // memcmp returns 0 if equal
-}
-
-bool assert_pointer_equals(char* test, uint8_t* point, uint8_t* goalPoint) {
-  if (test != NULL)
-    printf("Asserting %s\n", test);
-
-  printf("Test pointer:\t%p\n", point);
-  printf("Goal pointer:\t%p\n\n", goalPoint);
-
-  return point == goalPoint;
-}
 
 /**************************** APPEND TESTS ****************************/
 
@@ -205,25 +173,13 @@ bool test_flush_overflowed_window() {
 /**********************************************************************/
 
 int main() {
-  bool (*tests[])() = {
+  TestFunction tests[] = {
     test_append_no_overflow, test_append_overflow,
     test_flush_empty_buffer, test_flush_simple_case, 
     test_flush_wrap_around, test_flush_partial_window, test_flush_overflowed_window
   }; 
   int numTests = sizeof(tests)/sizeof(tests[0]);
-
-  int passCount = 0;
-  bool result = false;
-  for(int i = 0; i < numTests; i++) {
-    printf("--------------------------------------\n\n");
-    bool result = tests[i]();
-    printf("Test %s\n\n", result ? "passed" : "failed");
-    passCount += result ? 1 : 0;
-  }
-  printf("--------------------------------------\n");
-  printf("        |  Test summary  |\n\n");
-  printf("number of tests: %d\ntests passed: %d\n\n", numTests, passCount);
-
+  test(numTests, tests);
 
   return 0;
 }

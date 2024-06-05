@@ -30,7 +30,7 @@ $(OBJDIR)/%.o: src/%.c $(HDRS)
 
 # Compile test files into object files
 $(OBJDIR)/%.o: test/%.c $(HDRS)
-	$(CC) $(CFLAGS) -c $< -o $@ -I src/
+	$(CC) $(CFLAGS) -c $< -o $@ $(LIBTEST_LIB) -Isrc/ -I$(LIBTEST_DIR)
 
 # Link object files into executable
 $(TARGET): $(OBJS)
@@ -38,7 +38,7 @@ $(TARGET): $(OBJS)
 
 # Compile test source for test target
 $(TEST_TARGET): $(OBJS) $(TEST_OBJS) $(HDRS)
-	$(CC) $(CFLAGS) $(OBJS) $(TEST_OBJS) -o $@
+	$(CC) $(CFLAGS) $(OBJS) $(TEST_OBJS) -o $@ $(LIBTEST_LIB)
 
 # Define clean target to remove object files and executable
 clean:
