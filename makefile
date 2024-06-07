@@ -2,18 +2,19 @@
 ROOT = $(shell pwd)
 SUBPROJECTS = membuff quat
 LIBTEST_DIR = $(ROOT)/lib/libtest
-LIBTEST_LIB = -L$(LIBTEST_DIR)/build -ltest -I$(LIBTEST_DIR)/src
+LIBTEST_LIB = $(LIBTEST_DIR)/build/libtest.a
+LIBTEST_ARG = -L$(LIBTEST_DIR)/build -ltest -I$(LIBTEST_DIR)/src
 
 # Default target
 .PHONY: all test clean
 
-all: $(LIBTEST_DIR) $(SUBPROJECTS)
+all: $(SUBPROJECTS)
 
-test: $(LIBTEST_DIR)/build/libtest.a
+test: $(LIBTEST_LIB)
 	@echo "Running tests..."
 	@TOTAL_TESTS_RUN=0; TOTAL_TESTS_PASSED=0; 																		 \
 	for proj in $(SUBPROJECTS); do 																								 \
-	    TEST_OUTPUT=$$(make -C $$proj test LIBTEST_LIB="$(LIBTEST_LIB)" 					 \
+	    TEST_OUTPUT=$$(make -C $$proj test LIBTEST_ARG="$(LIBTEST_ARG)" 					 \
 																				 LIBTEST_DIR="$(LIBTEST_DIR)");				 	 \
 	    echo "$$TEST_OUTPUT"; 																										 \
 	    TESTS_RUN=$$(echo "$$TEST_OUTPUT" | grep -oP '(?<=number of tests: )\d+'); \
@@ -35,15 +36,15 @@ clean: clean-libtest $(patsubst %,clean-%,$(SUBPROJECTS))
 
 # Pattern rule for building subprojects
 $(SUBPROJECTS):
-	@$(MAKE) -C $@ LIBTEST_LIB="$(LIBTEST_LIB)"
+	@$(MAKE) -C $@
 
 # Special rule for building libtest
-$(LIBTEST_DIR)/build/libtest.a:
+$(LIBTEST_LIB):
 	@$(MAKE) -C $(LIBTEST_DIR)
 
 # Pattern rule for testing subprojects
 test-%:
-	@$(MAKE) -C $* test LIBTEST_LIB="$(LIBTEST_LIB)"
+	@$(MAKE) -C $* test LIBTEST_ARG="$(LIBTEST_ARG)" LIBTEST_DIR="$(LIBTEST_DIR)"
 
 # Pattern rule for cleaning subprojects
 clean-%:
