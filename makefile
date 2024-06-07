@@ -5,10 +5,13 @@ LIBTEST_DIR = $(ROOT)/lib/libtest
 LIBTEST_LIB = $(LIBTEST_DIR)/build/libtest.a
 LIBTEST_ARG = -L$(LIBTEST_DIR)/build -ltest -I$(LIBTEST_DIR)/src
 
+# Define the shared library targets for each subproject
+SUBPROJECT_LIBS = $(patsubst %,build/%.so,$(SUBPROJECTS))
+
 # Default target
 .PHONY: all test clean
 
-all: $(SUBPROJECTS)
+all: $(SUBPROJECT_LIBS)
 
 test: $(LIBTEST_LIB)
 	@echo "Running tests..."
@@ -35,8 +38,8 @@ test: $(LIBTEST_LIB)
 clean: clean-libtest $(patsubst %,clean-%,$(SUBPROJECTS))
 
 # Pattern rule for building subprojects
-$(SUBPROJECTS):
-	@$(MAKE) -C $@
+build/%.so:
+	@$(MAKE) -C $* 
 
 # Special rule for building libtest
 $(LIBTEST_LIB):
