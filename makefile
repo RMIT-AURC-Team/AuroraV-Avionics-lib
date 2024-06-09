@@ -5,7 +5,7 @@ LIBTEST_LIB = $(LIBTEST_DIR)/build/libtest.a
 LIBTEST_ARG = -L$(LIBTEST_DIR)/build -ltest -I$(LIBTEST_DIR)/src
 
 # Define the shared library targets for each subproject
-SUBPROJECT_LIBS = $(patsubst %,build/%.so,$(SUBPROJECTS))
+SUBPROJECT_LIBS = $(patsubst %,build/%.a,$(SUBPROJECTS))
 
 # Default target
 .PHONY: all test clean
@@ -36,27 +36,16 @@ test: $(LIBTEST_LIB)
 
 clean: clean-libtest $(patsubst %,clean-%,$(SUBPROJECTS))
 
-<<<<<<< Updated upstream
-# Pattern rule for building subprojects
-build/%.so:
-	@$(MAKE) -C $* 
-
-=======
->>>>>>> Stashed changes
 # Special rule for building libtest
 $(LIBTEST_LIB):
 	@$(MAKE) -C $(LIBTEST_DIR)
 
 # Pattern rule for building subproject shared libraries
-build/%.so:
+build/%.a:
 	@$(MAKE) -C $*
 
 # Pattern rule for testing subprojects
-<<<<<<< Updated upstream
-test-%:
-=======
 test-%: $(LIBTEST_LIB)
->>>>>>> Stashed changes
 	@$(MAKE) -C $* test LIBTEST_ARG="$(LIBTEST_ARG)" LIBTEST_DIR="$(LIBTEST_DIR)"
 
 # Pattern rule for cleaning subprojects
