@@ -1,19 +1,27 @@
-# List of subprojects
 ROOT = $(shell pwd)
-SUBPROJECTS = membuff quaternion
+BIN = bin
+SUBPROJECTS = membuff 
 LIBTEST_DIR = $(ROOT)/lib/libtest
-LIBTEST_LIB = -L$(LIBTEST_DIR)/build -ltest -I$(LIBTEST_DIR)/src
+LIBTEST_LIB = $(LIBTEST_DIR)/bin/libtest.a
+LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src
+
+CC = gcc
+CFLAGS = -Wall -g
+
+# Define the shared library targets for each subproject
+SUBPROJECT_LIBS := $(foreach proj,$(SUBPROJECTS),$(proj)/bin/lib$(proj).a)
+COMBINED_LIB = $(BIN)/libavionics.a
 
 # Default target
-.PHONY: all test clean
+.PHONY: all subprojects test clean
 
-all: $(LIBTEST_DIR) $(SUBPROJECTS)
+all: $(COMBINED_LIB)
 
-test: $(LIBTEST_DIR)/build/libtest.a
+test: $(LIBTEST_LIB)
 	@echo "Running tests..."
 	@TOTAL_TESTS_RUN=0; TOTAL_TESTS_PASSED=0; 																		 \
 	for proj in $(SUBPROJECTS); do 																								 \
-	    TEST_OUTPUT=$$(make -C $$proj test LIBTEST_LIB="$(LIBTEST_LIB)" 					 \
+	    TEST_OUTPUT=$$(make -C $$proj test LIBTEST_ARG="$(LIBTEST_ARG)" 					 \
 																				 LIBTEST_DIR="$(LIBTEST_DIR)");				 	 \
 	    echo "$$TEST_OUTPUT"; 																										 \
 	    TESTS_RUN=$$(echo "$$TEST_OUTPUT" | grep -oP '(?<=number of tests: )\d+'); \
@@ -32,18 +40,24 @@ test: $(LIBTEST_DIR)/build/libtest.a
 	echo "=========================="; 
 
 clean: clean-libtest $(patsubst %,clean-%,$(SUBPROJECTS))
+	rm -rf $(BIN)/*
 
-# Pattern rule for building subprojects
-$(SUBPROJECTS):
-	@$(MAKE) -C $@ LIBTEST_LIB="$(LIBTEST_LIB)"
+# Combine static subproject libraries to single combined library
+$(COMBINED_LIB): subprojects
+	@mkdir -p $(@D)
+	$(AR) -crs $@ $(SUBPROJECT_LIBS)
+
+# Special rule for building subprojects
+subprojects:
+	$(MAKE) -C $(SUBPROJECTS)
 
 # Special rule for building libtest
-$(LIBTEST_DIR)/build/libtest.a:
+$(LIBTEST_LIB):
 	@$(MAKE) -C $(LIBTEST_DIR)
 
 # Pattern rule for testing subprojects
-test-%:
-	@$(MAKE) -C $* test LIBTEST_LIB="$(LIBTEST_LIB)"
+test-%: $(LIBTEST_LIB)
+	@$(MAKE) -C $* test LIBTEST_ARG="$(LIBTEST_ARG)" LIBTEST_DIR="$(LIBTEST_DIR)"
 
 # Pattern rule for cleaning subprojects
 clean-%:

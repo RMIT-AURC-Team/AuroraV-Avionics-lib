@@ -38,6 +38,16 @@ bool assert_pointer_equals(char* test, uint8_t* point, uint8_t* goalPoint) {
   return point == goalPoint;
 }
 
+bool assert_float_equals(char* test, float value, float goal) {
+  if (test != NULL)
+    printf("Asserting %s\n", test);
+
+  printf("Test float:\t%f\n", value);
+  printf("Goal loat:\t%f\n\n", goal);
+
+  return value == goal;
+}
+
 void run_tests(int numTests, TestFunction tests[]) {
   int passCount = 0;
   bool result = false;
