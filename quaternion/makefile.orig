@@ -1,0 +1,74 @@
+# Define project name
+PROJECT_NAME = libquaternion
+
+CC = gcc
+<<<<<<< HEAD
+BIN = bin
+=======
+>>>>>>> 93077c45aa01ca061077b8fb9fa8f29dcc3407eb
+CFLAGS = -Wall -g -lm
+OBJDIR = build
+
+# Define all source files
+SRCS = $(shell find src/ -name "*.c") 
+HDRS = $(shell find src/ -name "*.h")
+TSTS = $(shell find test/ -name "*.c")
+
+# Define object files based on source files
+OBJS = $(SRCS:src/%.c=build/%.o)
+TEST_OBJS = $(TSTS:test/%.c=build/%.o)
+
+# Define target (executable name)
+<<<<<<< HEAD
+TARGET = $(BIN)/$(PROJECT_NAME).a
+TEST_TARGET = $(BIN)/$(PROJECT_NAME)_test
+=======
+TARGET = $(OBJDIR)/$(PROJECT_NAME)
+TEST_TARGET = $(OBJDIR)/$(PROJECT_NAME)_test
+>>>>>>> 93077c45aa01ca061077b8fb9fa8f29dcc3407eb
+
+all: $(TARGET)
+
+# Run unit tests
+test: $(TEST_TARGET)
+	./$(TEST_TARGET)
+
+<<<<<<< HEAD
+# Link object files into executable
+$(TARGET): $(OBJS)
+	@mkdir -p $(@D)
+	ar rcs $@ $^
+
+# Compile source files into object files
+$(OBJDIR)/%.o: src/%.c $(HDRS)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@ 
+=======
+# Compile source files into object files
+$(OBJDIR)/%.o: src/%.c $(HDRS)
+	$(CC) $(CFLAGS) -fPIC -c $< -o $@ 
+
+# Compile test files into object files
+$(OBJDIR)/%.o: test/%.c $(HDRS)
+	$(CC) $(CFLAGS) -c $< -o $@ $(LIBTEST_LIB) -Isrc/ -I$(LIBTEST_DIR)
+
+# Link object files into executable
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -shared $(OBJS) -o $@.a
+>>>>>>> 93077c45aa01ca061077b8fb9fa8f29dcc3407eb
+
+# Compile test source for test target
+$(TEST_TARGET): $(OBJS) $(TEST_OBJS) $(HDRS)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(OBJS) $(TEST_OBJS) -o $@ $(LIBTEST_ARG)
+
+# Compile test files into object files
+$(OBJDIR)/%.o: test/%.c $(HDRS)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@ $(LIBTEST_ARG) -I src/ -I$(LIBTEST_DIR)
+
+# Define clean target to remove object files and executable
+clean:
+	rm $(OBJDIR)/* $(BIN)/*
+
+.PHONY: all clean test

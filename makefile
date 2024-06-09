@@ -1,6 +1,6 @@
 ROOT = $(shell pwd)
 BIN = bin
-SUBPROJECTS = membuff 
+SUBPROJECTS = membuff quaternion
 LIBTEST_DIR = $(ROOT)/lib/libtest
 LIBTEST_LIB = $(LIBTEST_DIR)/bin/libtest.a
 LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src
@@ -42,14 +42,16 @@ test: $(LIBTEST_LIB)
 clean: clean-libtest $(patsubst %,clean-%,$(SUBPROJECTS))
 	rm -rf $(BIN)/*
 
+# Special rule for building subprojects
+subprojects:
+	@for proj in $(SUBPROJECTS); do 	\
+		make -C $$proj; 								\
+	done;
+
 # Combine static subproject libraries to single combined library
 $(COMBINED_LIB): subprojects
 	@mkdir -p $(@D)
 	$(AR) -crs $@ $(SUBPROJECT_LIBS)
-
-# Special rule for building subprojects
-subprojects:
-	$(MAKE) -C $(SUBPROJECTS)
 
 # Special rule for building libtest
 $(LIBTEST_LIB):
