@@ -15,8 +15,8 @@ OBJS = $(SRCS:src/%.c=build/%.o)
 TEST_OBJS = $(TSTS:test/%.c=build/%.o)
 
 # Define target (executable name)
-TARGET = $(OBJDIR)/membuff
-TEST_TARGET = $(OBJDIR)/membuff_test
+TARGET = $(OBJDIR)/$(PROJECT_NAME).a
+TEST_TARGET = $(OBJDIR)/$(PROJECT_NAME)_test
 
 all: $(TARGET)
 
@@ -24,21 +24,21 @@ all: $(TARGET)
 test: $(TEST_TARGET)
 	./$(TEST_TARGET)
 
-# Compile source files into object files
-$(OBJDIR)/%.o: src/%.c $(HDRS)
-	$(CC) $(CFLAGS) -fPIC -c $< -o $@ 
-
-# Compile test files into object files
-$(OBJDIR)/%.o: test/%.c $(HDRS)
-	$(CC) $(CFLAGS) -c $< -o $@ -I src/
-
 # Link object files into executable
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -shared $(OBJS) -o $@.a
+	ar rcs $@ $^
+
+# Compile source files into object files
+$(OBJDIR)/%.o: src/%.c $(HDRS)
+	$(CC) $(CFLAGS) -c $< -o $@ 
 
 # Compile test source for test target
 $(TEST_TARGET): $(OBJS) $(TEST_OBJS) $(HDRS)
 	$(CC) $(CFLAGS) $(OBJS) $(TEST_OBJS) -o $@
+
+# Compile test files into object files
+$(OBJDIR)/%.o: test/%.c $(HDRS)
+	$(CC) $(CFLAGS) -c $< -o $@ -I src/
 
 # Define clean target to remove object files and executable
 clean:
