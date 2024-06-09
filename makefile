@@ -1,6 +1,6 @@
 ROOT = $(shell pwd)
 BIN = bin
-SUBPROJECTS = membuff 
+SUBPROJECTS = quaternion
 LIBTEST_DIR = $(ROOT)/lib/libtest
 LIBTEST_LIB = $(LIBTEST_DIR)/bin/libtest.a
 LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src

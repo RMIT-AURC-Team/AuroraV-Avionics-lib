@@ -3,7 +3,7 @@ PROJECT_NAME = libquaternion
 
 CC = gcc
 BIN = bin
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -lm
 OBJDIR = build
 
 # Define all source files
