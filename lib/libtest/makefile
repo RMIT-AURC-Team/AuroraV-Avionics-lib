@@ -2,13 +2,14 @@
 PROJECT_NAME = libtest
 
 CC = gcc
+BIN = bin
 CFLAGS = -Wall -g
-BUILD_DIR = build
+OBJDIR = build
 
 # Define all source files
 SRCS = $(shell find src/ -name "*.c") 
 HDRS = $(shell find src/ -name "*.h")
-LIB = $(BUILD_DIR)/libtest.a
+LIB = $(BIN)/libtest.a
 
 # Define object files based on source files
 OBJS = $(SRCS:src/%.c=build/%.o)
@@ -19,15 +20,17 @@ TARGET = libtest
 all: $(LIB)
 
 $(LIB): $(OBJS)
+	@mkdir -p $(@D)
 	ar rcs $@ $^
 
 # Compile source files into object files
-$(BUILD_DIR)/%.o: src/%.c $(HDRS)
+$(OBJDIR)/%.o: src/%.c $(HDRS)
+	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@ 
 
 # Define clean target to remove object files and executable
 clean:
-	@rm -rf $(BUILD_DIR)/*
+	@rm -rf $(OBJDIR)/* $(BIN)
 
 .PHONY: all clean test
 

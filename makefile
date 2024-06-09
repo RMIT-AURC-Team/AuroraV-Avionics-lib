@@ -1,16 +1,21 @@
 ROOT = $(shell pwd)
-SUBPROJECTS = membuff quat
+BIN = bin
+SUBPROJECTS = membuff 
 LIBTEST_DIR = $(ROOT)/lib/libtest
-LIBTEST_LIB = $(LIBTEST_DIR)/build/libtest.a
-LIBTEST_ARG = -L$(LIBTEST_DIR)/build -ltest -I$(LIBTEST_DIR)/src
+LIBTEST_LIB = $(LIBTEST_DIR)/bin/libtest.a
+LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src
+
+CC = gcc
+CFLAGS = -Wall -g
 
 # Define the shared library targets for each subproject
-SUBPROJECT_LIBS = $(patsubst %,build/%.a,$(SUBPROJECTS))
+SUBPROJECT_LIBS := $(foreach proj,$(SUBPROJECTS),$(proj)/bin/lib$(proj).a)
+COMBINED_LIB = $(BIN)/libavionics.a
 
 # Default target
-.PHONY: all test clean
+.PHONY: all subprojects test clean
 
-all: $(SUBPROJECT_LIBS)
+all: $(COMBINED_LIB)
 
 test: $(LIBTEST_LIB)
 	@echo "Running tests..."
@@ -35,14 +40,20 @@ test: $(LIBTEST_LIB)
 	echo "=========================="; 
 
 clean: clean-libtest $(patsubst %,clean-%,$(SUBPROJECTS))
+	rm -rf $(BIN)/*
+
+# Combine static subproject libraries to single combined library
+$(COMBINED_LIB): subprojects
+	@mkdir -p $(@D)
+	$(AR) -crs $@ $(SUBPROJECT_LIBS)
+
+# Special rule for building subprojects
+subprojects:
+	$(MAKE) -C $(SUBPROJECTS)
 
 # Special rule for building libtest
 $(LIBTEST_LIB):
 	@$(MAKE) -C $(LIBTEST_DIR)
-
-# Pattern rule for building subproject shared libraries
-build/%.a:
-	@$(MAKE) -C $*
 
 # Pattern rule for testing subprojects
 test-%: $(LIBTEST_LIB)

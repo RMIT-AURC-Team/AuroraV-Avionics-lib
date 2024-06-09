@@ -1,5 +1,5 @@
 # Define project name
-PROJECT_NAME = membuff
+PROJECT_NAME = libmembuff
 
 CC = gcc
 BIN = bin
