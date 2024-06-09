@@ -2,7 +2,7 @@
 PROJECT_NAME = quaternion
 
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -lm
 OBJDIR = build
 
 # Define all source files
@@ -15,8 +15,8 @@ OBJS = $(SRCS:src/%.c=build/%.o)
 TEST_OBJS = $(TSTS:test/%.c=build/%.o)
 
 # Define target (executable name)
-TARGET = $(PROJECT_NAME)
-TEST_TARGET = $(PROJECT_NAME)_test
+TARGET = $(OBJDIR)/$(PROJECT_NAME)
+TEST_TARGET = $(OBJDIR)/$(PROJECT_NAME)_test
 
 all: $(TARGET)
 
@@ -26,7 +26,7 @@ test: $(TEST_TARGET)
 
 # Compile source files into object files
 $(OBJDIR)/%.o: src/%.c $(HDRS)
-	$(CC) $(CFLAGS) -c $< -o $@ 
+	$(CC) $(CFLAGS) -fPIC -c $< -o $@ 
 
 # Compile test files into object files
 $(OBJDIR)/%.o: test/%.c $(HDRS)
@@ -34,7 +34,7 @@ $(OBJDIR)/%.o: test/%.c $(HDRS)
 
 # Link object files into executable
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $@
+	$(CC) $(CFLAGS) -shared $(OBJS) -o $@.a
 
 # Compile test source for test target
 $(TEST_TARGET): $(OBJS) $(TEST_OBJS) $(HDRS)
