@@ -36,13 +36,6 @@ test: $(LIBTEST_LIB)
 
 clean: clean-libtest $(patsubst %,clean-%,$(SUBPROJECTS))
 
-<<<<<<< Updated upstream
-# Pattern rule for building subprojects
-build/%.so:
-	@$(MAKE) -C $* 
-
-=======
->>>>>>> Stashed changes
 # Special rule for building libtest
 $(LIBTEST_LIB):
 	@$(MAKE) -C $(LIBTEST_DIR)
@@ -52,11 +45,7 @@ build/%.so:
 	@$(MAKE) -C $*
 
 # Pattern rule for testing subprojects
-<<<<<<< Updated upstream
-test-%:
-=======
 test-%: $(LIBTEST_LIB)
->>>>>>> Stashed changes
 	@$(MAKE) -C $* test LIBTEST_ARG="$(LIBTEST_ARG)" LIBTEST_DIR="$(LIBTEST_DIR)"
 
 # Pattern rule for cleaning subprojects
