@@ -1,5 +1,8 @@
+# Define project name
+PROJECT_NAME = quaternion
+
 CC = gcc
-CFLAGS = -Wall -g -lm
+CFLAGS = -Wall -g
 OBJDIR = build
 
 # Define all source files
@@ -12,8 +15,8 @@ OBJS = $(SRCS:src/%.c=build/%.o)
 TEST_OBJS = $(TSTS:test/%.c=build/%.o)
 
 # Define target (executable name)
-TARGET = quaternion
-TEST_TARGET = quaternion_test
+TARGET = $(PROJECT_NAME)
+TEST_TARGET = $(PROJECT_NAME)_test
 
 all: $(TARGET)
 
