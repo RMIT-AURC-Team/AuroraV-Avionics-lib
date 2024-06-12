@@ -175,8 +175,8 @@ bool test_flush_overflowed_window() {
   printf("Buffer address: %p\n\n", buff);
 
   ASSERT("page ready", pageReady, true)
-  ASSERT_EQ("page head", mem.head, buff + 4, "p")
-  ASSERT_EQ("page tail", mem.tail, buff + 5, "p")
+  ASSERT_EQ("page head", mem.head, buff + pageSize, "p")
+  ASSERT_EQ("page tail", mem.tail, buff + 2*pageSize - 1, "p")
   ASSERT_BUFF_EQ("output buffer", outBuff, goalBuff, pageSize, "d")
   return true;
 }
