@@ -3,14 +3,40 @@
 
 typedef bool (*TestFunction)();
 
-#define ASSERT_EQ(test, value, goal)  \
-  printf("Asserting %s\n", test);     \
-  printf("Test value:\t%f\n", value); \
-  printf("Goal value:\t%f\n", goal);  \
-  if (value != goal) {                \
-    printf("Failed.\n\n");            \
-    return false;                     \
-  }                                   \
+#define ASSERT(test, value, goal)   \
+  printf("Asserting "test"\n");     \
+  if (value != goal) {              \
+    printf("Failed.\n\n");          \
+    return false;                   \
+  }                                 \
+  printf("Success!\n\n");
+
+#define ASSERT_EQ(test, value, goal, datatype)  \
+  printf("Asserting "test"\n");                 \
+  printf("Test value:\t%"datatype"\n", value);  \
+  printf("Goal value:\t%"datatype"\n", goal);   \
+  if (value != goal) {                          \
+    printf("Failed.\n\n");                      \
+    return false;                               \
+  }                                             \
+  printf("Success!\n\n");
+
+#define ASSERT_BUFF_EQ(test, buff, goal, size, datatype)  \
+  printf("Asserting "test"\n", test);                     \ 
+  printf("Test buffer:\t ");                              \ 
+  for(int i = 0; i < size; i++)                           \
+    printf("%"datatype" ", buff[i]);                      \
+  printf("\n");                                           \
+                                                          \
+  printf("Goal buffer:\t ");                              \
+  for(int i = 0; i < size; i++)                           \
+    printf("%"datatype" ", goal[i]);                      \
+  printf("\n");                                           \
+                                                          \
+  if (memcmp(buff, goal, size)) {                         \
+    printf("Failed.\n\n");                                \
+    return false;                                         \
+  }                                                       \
   printf("Success!\n\n");
 
 bool assert(char*, bool, bool);
