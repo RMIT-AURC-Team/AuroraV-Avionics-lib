@@ -1,0 +1,6 @@
+[submodule "lib/libcmsis/src/CMSIS_5"]
+	path = lib/libcmsis/src/CMSIS_5
+	url = https://github.com/ARM-software/CMSIS_5
+[submodule "lib/libcmsis/src/CMSIS-DSP"]
+	path = lib/libcmsis/src/CMSIS-DSP
+	url = https://github.com/ARM-software/CMSIS-DSP
