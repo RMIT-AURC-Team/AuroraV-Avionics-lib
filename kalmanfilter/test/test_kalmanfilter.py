@@ -1,4 +1,5 @@
 import ctypes
+import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -59,6 +60,8 @@ if __name__ == "__main__":
         [d for d in data_h['Accel_Z']][61:-30:10]
     ]
     baro = [d for d in data_l["Baro_Altitude_AGL_(feet)"]]
+    vel = data_l["Velocity_Up"]
+    cosines = [math.cos(x*(math.pi/180)) for x in data_l["Tilt_Angle_(deg)"]]
 
     # ================================================
     # Initialise filter parameters
@@ -100,21 +103,23 @@ if __name__ == "__main__":
 
     data = [0.0, 0.0, 0.0]
     kf.x = ArmMatrixInstanceF32(
-        1, 3, (ctypes.c_float * len(data))(*data))
+        3, 1, (ctypes.c_float * len(data))(*data))
 
     data = [0.0, 0.0]
     kf.z = ArmMatrixInstanceF32(
-        1, 2, (ctypes.c_float * len(data))(*data))
+        2, 1, (ctypes.c_float * len(data))(*data))
 
     # ================================================
     # Run filter
     # ================================================
     x_est = []
     for i in range(data_count):
-        kf.z.pData[0] = float(baro[i])
-        kf.z.pData[1] = float(9.81 * accel[0][i] - 9.81)
+        kf.z.pData[0] = ctypes.c_float(baro[i])
+        kf.z.pData[1] = ctypes.c_float(
+            3.28 * (cosines[i] * 9.81 * (accel[0][i])-9.81))
         lib.KalmanFilter_update(ctypes.byref(kf))
-        x_est.append(kf.x.pData[:3])
+        x_est.append(kf.x.pData[1])
 
-    plt.plot(t, [x[1] for x in x_est])
+    plt.plot(t, [x for x in x_est])
+    plt.plot(t, vel)
     plt.show()
