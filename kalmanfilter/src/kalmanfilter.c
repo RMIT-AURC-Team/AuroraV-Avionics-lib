@@ -61,17 +61,20 @@ void KalmanFilter_update(KalmanFilter* kalman, arm_matrix_instance_f32* z) {
   arm_matrix_instance_f32 *x = &kalman->x;
 
   // Define intermediate matrices
-  float y_data[2];     // Innovation or measurement residual
-  float S_data[4];     // Innovation covariance
-  float S_inv_data[4]; // Inverse of innovation covariance
-  float x_pred_data[3];
-  float P_pred_data[9];
-  float H_trans_data[6];
+  // TODO: extract initialisation of intermediate matrices for performance
+  //  : Performance indicator measurements should probably be ran first
+  //    to determine if this is even necessary.
+  float y_data[2];        // Innovation or measurement residual
+  float S_data[4];        // Innovation covariance
+  float S_inv_data[4];    // Inverse of innovation covariance
+  float x_pred_data[3];   // State prediction vector
+  float P_pred_data[9];   // Covariance prediction matrix
+  float H_trans_data[6];  // Measurement model transpose
   float temp2x1_data[2]; 
   float temp2x3_data[6]; 
   float temp3x2_data[6]; 
   float temp3x3_data[9]; 
-  float I_data[9] = {
+  float I_data[9] = {     // Identity matrix
     1.0f, 0.0f, 0.0f, 
     0.0f, 1.0f, 0.0f, 
     0.0f, 0.0f, 1.0f
