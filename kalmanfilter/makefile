@@ -13,16 +13,22 @@ TSTS = $(shell find test/ -name "test_*.py")
 OBJS = $(SRCS:src/%.c=build/%.o)
 
 # Define target (executable name)
-TARGET = $(BIN)/$(PROJECT_NAME).so
+TARGET = $(BIN)/$(PROJECT_NAME).a
+SHARED = $(BIN)/$(PROJECT_NAME).so
 
-all: $(TARGET)
+all: $(TARGET) $(SHARED)
 
 # Define test target to run all test_*.py files in the test/ directory
 test: $(TARGET)
 	python $(TSTS)
 
-# Link object files into executable
+# Link object files into shared library
 $(TARGET): $(OBJS)
+	@mkdir -p $(@D)
+	$(AR) rcs $@ $^
+
+# Link object files into shared library
+$(SHARED): $(OBJS)
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -shared -o $@ $^ $(CMSIS_INC) -lm
 
