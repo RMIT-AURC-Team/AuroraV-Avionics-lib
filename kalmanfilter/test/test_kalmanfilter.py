@@ -106,7 +106,7 @@ if __name__ == "__main__":
         3, 1, (ctypes.c_float * len(data))(*data))
 
     data = [0.0, 0.0]
-    kf.z = ArmMatrixInstanceF32(
+    z = ArmMatrixInstanceF32(
         2, 1, (ctypes.c_float * len(data))(*data))
 
     # ================================================
@@ -114,10 +114,10 @@ if __name__ == "__main__":
     # ================================================
     x_est = []
     for i in range(data_count):
-        kf.z.pData[0] = ctypes.c_float(baro[i])
-        kf.z.pData[1] = ctypes.c_float(
+        z.pData[0] = ctypes.c_float(baro[i])
+        z.pData[1] = ctypes.c_float(
             3.28 * (cosines[i] * 9.81 * (accel[0][i])-9.81))
-        lib.KalmanFilter_update(ctypes.byref(kf))
+        lib.KalmanFilter_update(ctypes.byref(kf), ctypes.byref(z))
         x_est.append(kf.x.pData[1])
 
     plt.plot(t, [x for x in x_est])

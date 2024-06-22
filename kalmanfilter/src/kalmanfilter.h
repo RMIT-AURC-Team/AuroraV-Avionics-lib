@@ -12,10 +12,10 @@ typedef struct KalmanFilter {
   arm_matrix_instance_f32 K; // Kalman gain
   arm_matrix_instance_f32 x; // State estimate
   arm_matrix_instance_f32 z; // Measurement
-  void (*update)(struct KalmanFilter*);
+  void (*update)(struct KalmanFilter*, arm_matrix_instance_f32*);
 } KalmanFilter;
 
 void KalmanFilter_init(KalmanFilter*);
-void KalmanFilter_update(KalmanFilter*);
+void KalmanFilter_update(KalmanFilter*, arm_matrix_instance_f32*);
 
 #endif

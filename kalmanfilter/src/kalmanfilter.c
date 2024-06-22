@@ -32,7 +32,6 @@ void KalmanFilter_init(KalmanFilter* kalman) {
     0.0f, 0.0f
   };
   static float x_data[3] = {0.0f, 0.0f, 0.0f};
-  static float z_data[2] = {0.0f, 0.0f};
 
   arm_mat_init_f32(&kalman->A, 3, 3, A_data);
   arm_mat_init_f32(&kalman->H, 2, 3, H_data);
@@ -41,7 +40,6 @@ void KalmanFilter_init(KalmanFilter* kalman) {
   arm_mat_init_f32(&kalman->P, 3, 3, P_data);
   arm_mat_init_f32(&kalman->K, 3, 2, K_data); // K will be calculated in the update
   arm_mat_init_f32(&kalman->x, 3, 1, x_data);
-  arm_mat_init_f32(&kalman->z, 2, 1, z_data);
 
   kalman->update = KalmanFilter_update;
 }
@@ -51,7 +49,7 @@ void KalmanFilter_init(KalmanFilter* kalman) {
 /* ===============================================================================
  * UPDATE
  * =============================================================================== */
-void KalmanFilter_update(KalmanFilter* kalman) {
+void KalmanFilter_update(KalmanFilter* kalman, arm_matrix_instance_f32* z) {
 
   // Extract matrices from the struct
   arm_matrix_instance_f32 *A = &kalman->A;
@@ -61,9 +59,8 @@ void KalmanFilter_update(KalmanFilter* kalman) {
   arm_matrix_instance_f32 *P = &kalman->P;
   arm_matrix_instance_f32 *K = &kalman->K;
   arm_matrix_instance_f32 *x = &kalman->x;
-  arm_matrix_instance_f32 *z = &kalman->z;
 
-  // Define temporary matrices
+  // Define intermediate matrices
   float y_data[2];     // Innovation or measurement residual
   float S_data[4];     // Innovation covariance
   float S_inv_data[4]; // Inverse of innovation covariance
