@@ -1,7 +1,7 @@
+import pathlib
 import ctypes
 import math
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -29,11 +29,11 @@ KalmanFilter._fields_ = [
     ('update', ctypes.CFUNCTYPE(None, ctypes.POINTER(KalmanFilter))),
 ]
 
-
-dir = '/home/matt/uni/current/AuroraV-Avionics-lib/kalmanfilter'
+filepath = pathlib.Path(__file__).parent
+subroot = filepath.parent.resolve()
 
 # Load the shared library
-lib = ctypes.CDLL(f'{dir}/bin/libkalmanfilter.so')
+lib = ctypes.CDLL(f'{subroot}/bin/libkalmanfilter.so')
 
 # Function signatures
 lib.KalmanFilter_init.argtypes = [ctypes.POINTER(KalmanFilter)]
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     # ================================================
     # Read in CSV data
     # ================================================
-    data_h = pd.read_csv(f"{dir}/test/data_highres.csv")
-    data_l = pd.read_csv(f"{dir}/test/data_lowres.csv")
+    data_h = pd.read_csv(f"{subroot}/test/data_highres.csv")
+    data_l = pd.read_csv(f"{subroot}/test/data_lowres.csv")
     t = data_l['Flight_Time_(s)']
     data_count = len(t)
 
