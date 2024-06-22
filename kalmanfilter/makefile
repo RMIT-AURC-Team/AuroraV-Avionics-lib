@@ -7,6 +7,7 @@ OBJDIR = build
 # Define all source files
 SRCS = $(shell find src/ -name "*.c") 
 HDRS = $(shell find src/ -name "*.h")
+TSTS = $(shell find test/ -name "test_*.py")
 
 # Define object files based on source files
 OBJS = $(SRCS:src/%.c=build/%.o)
@@ -15,6 +16,10 @@ OBJS = $(SRCS:src/%.c=build/%.o)
 TARGET = $(BIN)/$(PROJECT_NAME).so
 
 all: $(TARGET)
+
+# Define test target to run all test_*.py files in the test/ directory
+test: $(TARGET)
+	python $(TSTS)
 
 # Link object files into executable
 $(TARGET): $(OBJS)

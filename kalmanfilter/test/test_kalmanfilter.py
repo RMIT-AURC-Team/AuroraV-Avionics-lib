@@ -122,4 +122,9 @@ if __name__ == "__main__":
 
     plt.plot(t, [x for x in x_est])
     plt.plot(t, vel)
+    plt.xlabel("Time (s)")
+    plt.ylabel("Velocity (ft/s)")
+    plt.legend(["Avionics", "Blue Raven"])
+    plt.legend(["Calculated estimate", "BR ground truth"])
+    plt.title("Global vertical velocity")
     plt.show()
