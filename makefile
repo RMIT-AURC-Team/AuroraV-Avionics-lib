@@ -1,7 +1,6 @@
 ROOT = $(shell pwd)
 BIN = bin
-#SUBPROJECTS = membuff quaternion kalmanfilter
-SUBPROJECTS = kalmanfilter
+SUBPROJECTS = membuff quaternion kalmanfilter
 
 LIBTEST_DIR = $(ROOT)/lib/libtest
 LIBTEST_LIB = $(LIBTEST_DIR)/bin/libtest.a
@@ -13,17 +12,20 @@ LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
 
 # CC = arm-none-eabi-gcc
 # AR = arm-none-eabi-ar
-# CFLAGS = -mcpu=cortex-m4 				\
-          -mfloat-abi=hard  		\
-          -mfpu=fpv4-sp-d16 		\
-          -Ofast -ffast-math 		\
-          -DNDEBUG 							\
-          -Wall -Wextra -Werror \
-          -fPIC  --specs=nosys.specs
+# CFLAGS = -mcpu=cortex-m4 			 \
+         -mfloat-abi=hard  		 \
+         -mfpu=fpv4-sp-d16 		 \
+         -Ofast -ffast-math 	 \
+         -DNDEBUG 						 \
+         -Wall -Wextra -Werror \
 
 CC = gcc
 AR = ar
-CFLAGS = -Wall -g -D__GNUC_PYTHON__ 
+CFLAGS = -Wall -g
+
+ifdef PIC
+	CFLAGS += -fPIC
+endif
 
 # Includes for CMSIS lib
 CMSIS_ROOT = $(LIBCMSIS_DIR)/src
@@ -39,7 +41,7 @@ CMSIS_INC := $(LIBCMSIS_ARG)
 CMSIS_INC += $(addprefix -I,$(DSP_INCLUDES))
 CMSIS_INC += $(addprefix -I,$(CMSIS_CORE_INCLUDES))
 
-# Define the shared library targets for each subproject
+# Define the static library targets for each subproject
 SUBPROJECT_LIBS := $(foreach proj,$(SUBPROJECTS),$(proj)/bin/lib$(proj).a)
 COMBINED_LIB = $(BIN)/libavionics.a
 
@@ -81,9 +83,10 @@ clean: clean-libtest clean-libcmsis $(patsubst %,clean-%,$(SUBPROJECTS))
 subprojects:
 	@for proj in $(SUBPROJECTS); do 														\
 		make -C $$proj CC="$(CC)"  AR="$(AR)" CFLAGS="$(CFLAGS)" 	\
-									 LIBCMSIS_ARG="$(LIBCMSIS_ARG)"  \
-									 LIBCMSIS_DIR="$(LIBCMSIS_DIR)"  \
-									 CMSIS_INC="$(CMSIS_INC)"; 			 \
+									 LIBCMSIS_ARG="$(LIBCMSIS_ARG)"  						\
+									 LIBCMSIS_DIR="$(LIBCMSIS_DIR)"  						\
+									 CMSIS_INC="$(CMSIS_INC)" 			 						\
+									 PIC=$(PIC);										 						\
 	done;
 
 # Combine static subproject libraries to single combined library
@@ -99,8 +102,9 @@ $(LIBCMSIS_LIB):
 
 # Pattern rule for testing subprojects
 test-%: $(LIBTEST_LIB) $(LIBCMSIS_LIB)
-	@$(MAKE) -C $* test LIBTEST_ARG="$(LIBTEST_ARG)" LIBTEST_DIR="$(LIBTEST_DIR)" \
-											LIBCMSIS_ARG="$(LIBCMSIS_ARG)" LIBCMSIS_DIR="$(LIBCMSIS_DIR)"
+	@$(MAKE) -C $* test LIBTEST_ARG="$(LIBTEST_ARG)" LIBTEST_DIR="$(LIBTEST_DIR)" 		\
+											LIBCMSIS_ARG="$(LIBCMSIS_ARG)" LIBCMSIS_DIR="$(LIBCMSIS_DIR)" \
+											PIC=$(PIC)
 
 clean-%:
 	@$(MAKE) -C $* clean

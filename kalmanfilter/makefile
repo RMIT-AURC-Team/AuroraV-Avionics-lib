@@ -16,10 +16,14 @@ OBJS = $(SRCS:src/%.c=build/%.o)
 TARGET = $(BIN)/$(PROJECT_NAME).a
 SHARED = $(BIN)/$(PROJECT_NAME).so
 
-all: $(TARGET) $(SHARED)
+ifdef PIC
+all: $(SHARED)
+else
+all: $(TARGET)
+endif
 
 # Define test target to run all test_*.py files in the test/ directory
-test: $(TARGET)
+test: $(SHARED)
 	python $(TSTS)
 
 # Link object files into static library
@@ -35,10 +39,10 @@ $(SHARED): $(OBJS)
 # Compile source files into object files
 $(OBJDIR)/%.o: src/%.c $(HDRS)
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c -fPIC $(CMSIS_INC) $< -o $@
+	$(CC) $(CFLAGS) -c $(CMSIS_INC) $< -o $@
 
 # Define clean target to remove object files and executable
 clean:
-	rm $(OBJDIR)/* $(BIN)/*
+	rm -rf $(OBJDIR)/* $(BIN)/*
 
 .PHONY: all clean test

@@ -45,6 +45,6 @@ $(OBJDIR)/%.o: test/%.c $(HDRS)
 
 # Define clean target to remove object files and executable
 clean:
-	rm $(OBJDIR)/* $(BIN)/*
+	rm -rf $(OBJDIR)/* $(BIN)/*
 
 .PHONY: all clean test
