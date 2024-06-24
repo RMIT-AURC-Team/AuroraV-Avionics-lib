@@ -22,15 +22,15 @@ all: $(TARGET) $(SHARED)
 test: $(TARGET)
 	python $(TSTS)
 
-# Link object files into shared library
+# Link object files into static library
 $(TARGET): $(OBJS)
 	@mkdir -p $(@D)
-	$(AR) rcs $@ $^
+	$(AR) -rcs $@ $^
 
 # Link object files into shared library
 $(SHARED): $(OBJS)
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -shared -o $@ $^ $(CMSIS_INC) -lm
+	$(CC) $(CFLAGS) -shared -o $@ $^ $(CMSIS_INC)
 
 # Compile source files into object files
 $(OBJDIR)/%.o: src/%.c $(HDRS)

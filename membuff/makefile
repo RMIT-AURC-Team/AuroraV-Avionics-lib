@@ -1,9 +1,7 @@
 # Define project name
 PROJECT_NAME = libmembuff
 
-CC = gcc
 BIN = bin
-CFLAGS = -Wall -g
 OBJDIR = build
 
 # Define all source files
@@ -28,7 +26,7 @@ test: $(TEST_TARGET)
 # Link object files into executable
 $(TARGET): $(OBJS)
 	@mkdir -p $(@D)
-	ar rcs $@ $^
+	$(AR) -rcs $@ $^
 
 # Compile source files into object files
 $(OBJDIR)/%.o: src/%.c $(HDRS)

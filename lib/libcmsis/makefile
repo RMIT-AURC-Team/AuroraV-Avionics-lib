@@ -3,9 +3,9 @@ CMSIS_ROOT := src
 
 CMSIS_5 := $(CMSIS_ROOT)/CMSIS_5
 CMSIS_DSP := $(CMSIS_ROOT)/CMSIS-DSP
-CMSIS_CORE_INCLUDES := $(CMSIS_5)/CMSIS/Core/Include
 
 # Includes
+CMSIS_CORE_INCLUDES := $(CMSIS_5)/CMSIS/Core/Include
 DSP_INCLUDES := $(CMSIS_DSP)/Include \
                 $(CMSIS_DSP)/PrivateInclude
 
@@ -31,7 +31,9 @@ STATIC_LIB := $(BIN)/libCMSISDSP.a
 SHARED_LIB := $(BIN)/libCMSISDSP.so
 
 # Build all targets
+#
 all: $(STATIC_LIB) 
+
 # Build static library
 $(STATIC_LIB): $(OBJECTS)
 	$(AR) -rcs $@ $^
