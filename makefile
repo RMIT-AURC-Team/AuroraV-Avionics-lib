@@ -1,4 +1,9 @@
 ROOT = $(shell pwd)
+# Normalise path if on windows
+ifeq ($(OS),Windows_NT)
+	ROOT := $(shell cygpath -m $(ROOT))
+endif
+
 BIN = bin
 SUBPROJECTS = membuff quaternion kalmanfilter
 
@@ -12,7 +17,7 @@ LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
 
 # CC = arm-none-eabi-gcc
 # AR = arm-none-eabi-ar
-# CFLAGS = -mcpu=cortex-m4 			 \
+# CFLAGS = -mcpu=cortex-m4 		 \
          -mfloat-abi=hard  		 \
          -mfpu=fpv4-sp-d16 		 \
          -Ofast -ffast-math 	 \
