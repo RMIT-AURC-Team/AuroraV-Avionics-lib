@@ -5,9 +5,9 @@ BIN = bin
 OBJDIR = build
 
 # Define all source files
-SRCS = $(shell find src/ -name "*.c") 
-HDRS = $(shell find src/ -name "*.h")
-TSTS = $(shell find test/ -name "*.c")
+SRCS = $(wildcard src/*.c) 
+HDRS = $(wildcard src/*.h)
+TSTS = $(wildcard test/*.c)
 
 # Define object files based on source files
 OBJS = $(SRCS:src/%.c=build/%.o)
@@ -36,7 +36,7 @@ $(OBJDIR)/%.o: src/%.c $(HDRS)
 # Compile test source for test target
 $(TEST_TARGET): $(OBJS) $(TEST_OBJS) $(HDRS)
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(OBJS) $(TEST_OBJS) -o $@ $(LIBTEST_ARG)
+	$(CC) $(CFLAGS) $(OBJS) $(TEST_OBJS) -o $@ $(LIBTEST_ARG) -lm
 
 # Compile test files into object files
 $(OBJDIR)/%.o: test/%.c $(HDRS)

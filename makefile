@@ -37,10 +37,7 @@ LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
 
 CC = gcc
 AR = ar
-CFLAGS = -Wall -g
-ifdef PIC
-	CFLAGS += -fPIC
-endif
+CFLAGS := -Wall -g
 
 # Includes for CMSIS lib
 CMSIS_ROOT = $(LIBCMSIS_DIR)/src
@@ -65,16 +62,16 @@ COMBINED_LIB = $(BIN)/libavionics.a
 
 all: $(COMBINED_LIB)
 
-test: $(LIBTEST_LIB)
+test: $(LIBCMSIS_LIB) $(LIBTEST_LIB)
+	@echo "$(CFLAGS)"
 	@echo "Running tests..."
 	@TOTAL_TESTS_RUN=0; TOTAL_TESTS_PASSED=0; 																		 \
 	for proj in $(SUBPROJECTS); do 																								 \
 	    TEST_OUTPUT=$$(make -C $$proj test LIBTEST_ARG="$(LIBTEST_ARG)" 					 \
 																				 LIBTEST_DIR="$(LIBTEST_DIR)"					 	 \
-																				 LIBCMSIS_ARG="$(LIBCMSIS_ARG)"					 \
-																				 LIBCMSIS_DIR="$(LIBCMSIS_DIR)" 				 \
+																				 CMSIS_INC="$(CMSIS_INC)"					 			 \
 																				 AR="$(AR)" 												     \
-																				 CC="$(CC)" CFLAGS="$(CFLAGS)");				 \
+																				 CC="$(CC)" CFLAGS:="$(CFLAGS) -fPIC");	 \
 	    echo "$$TEST_OUTPUT"; 																										 \
 	    TESTS_RUN=$$(echo "$$TEST_OUTPUT" | grep -oP '(?<=number of tests: )\d+'); \
 	    TESTS_PASSED=$$(echo "$$TEST_OUTPUT" | grep -oP '(?<=tests passed: )\d+'); \
@@ -101,11 +98,9 @@ subprojects:
 		make -C $$proj CC="$(CC)"  AR="$(AR)" CFLAGS="$(CFLAGS)" 	\
 									 LIBCMSIS_ARG="$(LIBCMSIS_ARG)"  						\
 									 LIBCMSIS_DIR="$(LIBCMSIS_DIR)"  						\
-									 CMSIS_INC="$(CMSIS_INC)" 			 						\
-									 PIC=$(PIC);										 						\
+									 CMSIS_INC="$(CMSIS_INC)"; 			 						\
 		ln -rsf $$proj/src/$$proj.h $(INC)/$$proj.h; 							\
 	done;
-
 # Combine static subproject libraries to single combined library
 $(COMBINED_LIB): $(LIBCMSIS_LIB) subprojects
 	@mkdir -p $(@D)
@@ -121,7 +116,6 @@ $(LIBCMSIS_LIB):
 test-%: $(LIBTEST_LIB) $(LIBCMSIS_LIB)
 	@$(MAKE) -C $* test LIBTEST_ARG="$(LIBTEST_ARG)" LIBTEST_DIR="$(LIBTEST_DIR)" 		\
 											LIBCMSIS_ARG="$(LIBCMSIS_ARG)" LIBCMSIS_DIR="$(LIBCMSIS_DIR)" \
-											PIC=$(PIC)
 
 clean-%:
 	@$(MAKE) -C $* clean

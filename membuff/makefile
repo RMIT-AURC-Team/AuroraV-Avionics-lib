@@ -5,9 +5,9 @@ BIN = bin
 OBJDIR = build
 
 # Define all source files
-SRCS = $(shell find src/ -name "*.c") 
-HDRS = $(shell find src/ -name "*.h")
-TSTS = $(shell find test/ -name "*.c")
+SRCS = $(wildcard src/*.c) 
+HDRS = $(wildcard src/*.h)
+TSTS = $(wildcard test/*.c)
 
 # Define object files based on source files
 OBJS = $(SRCS:src/%.c=build/%.o)
