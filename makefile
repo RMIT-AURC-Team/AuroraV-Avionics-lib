@@ -5,6 +5,7 @@ ifeq ($(OS),Windows_NT)
 endif
 
 BIN = bin
+INC = inc
 SUBPROJECTS = membuff quaternion kalmanfilter
 
 LIBTEST_DIR = $(ROOT)/lib/libtest
@@ -14,6 +15,16 @@ LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src
 LIBCMSIS_DIR = $(ROOT)/lib/libcmsis
 LIBCMSIS_LIB = $(LIBCMSIS_DIR)/bin/libCMSISDSP.a
 LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
+
+# CC = armclang
+# AR = armar
+# CFLAGS = -mcpu=cortex-m4 		 \
+         -mfloat-abi=hard  		 \
+         -mfpu=fpv4-sp-d16 		 \
+         -Ofast -ffast-math 	 \
+         -DNDEBUG 						 \
+         -Wall -Wextra 				 \
+         --target=arm-arm-none-eabi
 
 # CC = arm-none-eabi-gcc
 # AR = arm-none-eabi-ar
@@ -27,7 +38,6 @@ LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
 CC = gcc
 AR = ar
 CFLAGS = -Wall -g
-
 ifdef PIC
 	CFLAGS += -fPIC
 endif
@@ -82,16 +92,18 @@ test: $(LIBTEST_LIB)
 	echo "=========================="; 
 
 clean: clean-libtest clean-libcmsis $(patsubst %,clean-%,$(SUBPROJECTS))
-	rm -rf $(BIN)/*
+	rm -rf $(BIN)/* $(INC)/*
 
 # Special rule for building subprojects
 subprojects:
+	@mkdir -p $(INC)
 	@for proj in $(SUBPROJECTS); do 														\
 		make -C $$proj CC="$(CC)"  AR="$(AR)" CFLAGS="$(CFLAGS)" 	\
 									 LIBCMSIS_ARG="$(LIBCMSIS_ARG)"  						\
 									 LIBCMSIS_DIR="$(LIBCMSIS_DIR)"  						\
 									 CMSIS_INC="$(CMSIS_INC)" 			 						\
 									 PIC=$(PIC);										 						\
+		ln -rsf $$proj/src/$$proj.h $(INC)/$$proj.h; 							\
 	done;
 
 # Combine static subproject libraries to single combined library
