@@ -82,8 +82,6 @@ bool MemBuff_readPage(MemBuff* mem, uint8_t* outBuff) {
     return false;
   }
 
-  // Otherwise reset flag and pass out buffer
-  mem->pageReady = false;
   mem->flush(mem, outBuff);  // Flush to output buffer
   return true;
 }
@@ -100,36 +98,42 @@ bool MemBuff_readPage(MemBuff* mem, uint8_t* outBuff) {
  *    to use readPage where possible to flush out the window when full.
  * =============================================================================== */
 bool MemBuff_flush(MemBuff* mem, uint8_t* outBuff) {
-  // Early exit with false if nothing to flush
+ // Early exit with false if nothing to flush
   if (mem->length == 0) {
     return false;
   }
 
+  // Determine the amount of data to flush
+  int flushSize = (mem->length >= mem->pageSize) ? mem->pageSize : mem->length;
+
   // Copy data from page window to output buffer
-  if (mem->head < mem->tail) {
-    // If page window is within the buffer 
-    memcpy(outBuff, mem->head, mem->pageSize);   // Copy in data from head to tail
+  if (mem->head + flushSize <= mem->buffEnd) {
+    // If flush window is within the buffer 
+    memcpy(outBuff, mem->head, flushSize);   // Copy data from head to tail
   } else {
-    // If page window overflows buffer
+    // If flush window overflows buffer
     int diff = (int)(mem->buffEnd - mem->head);
-    int startDiff = mem->pageSize - diff;
-    memcpy(outBuff, mem->head, diff);             // Copy in data from head to end of buffer
-    memcpy(outBuff + diff, mem->buff, startDiff); // Copy in data from start of buffer to tail
+    int startDiff = flushSize - diff;
+    memcpy(outBuff, mem->head, diff);             // Copy data from head to end of buffer
+    memcpy(outBuff + diff, mem->buff, startDiff); // Copy data from start of buffer to tail
   }
 
-  // Slide head to next page window
-  if (mem->length >= mem->pageSize) {
-    // If cell has overflowed page window
-    mem->_slide(mem, (mem->head + mem->pageSize)); // Push head and tail forward a page length
-    mem->length = (mem->cell - mem->head);         // Calculate new length from cell overflow
+  // Slide head to next page window or to cell
+  if (flushSize == mem->pageSize) {
+    mem->_slide(mem, mem->head + mem->pageSize);  // Push head and tail forward a page length
   } else {
-    // If cell is still within page window
-    mem->_slide(mem, mem->cell);                   // Push head and tail forward to start at current cell
-    mem->length = 0;                               // Reset length to 0
+    mem->_slide(mem, mem->cell);  // Push head to the current cell position
   }
 
-  // Erase page window from current cell onward
+  // Update length
+  mem->length -= flushSize;
+
+  // Update pageReady flag
+  mem->pageReady = (mem->length >= mem->pageSize);
+
+  // Erase flushed data from current cell onward
   mem->erase(mem, mem->cell, mem->tail);
+
   return true;
 }
 
