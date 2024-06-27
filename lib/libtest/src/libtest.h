@@ -1,6 +1,8 @@
 #ifndef _LIBTEST_H
 #define _LIBTEST_H
 
+#include "math.h"
+
 typedef bool (*TestFunction)();
 
 #define ASSERT(test, value, goal)   \
@@ -19,6 +21,17 @@ typedef bool (*TestFunction)();
     printf("Failed.\n\n");                      \
     return false;                               \
   }                                             \
+  printf("Success!\n\n");
+
+#define ASSERT_EQ_EPS(test, value, goal, epsilon, datatype)  \
+  printf("Asserting "test"\n");                              \
+  printf("Test value:\t%"datatype"\n", value);               \
+  printf("Goal value:\t%"datatype"\n", goal);                \
+  if (fabs(value - goal) > epsilon) {                        \
+    printf("Epsilon %f\n", value-goal);                      \
+    printf("Failed.\n\n");                                   \
+    return false;                                            \
+  }                                                          \
   printf("Success!\n\n");
 
 #define ASSERT_BUFF_EQ(test, buff, goal, size, datatype)  \
