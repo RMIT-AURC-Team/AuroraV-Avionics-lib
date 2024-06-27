@@ -101,16 +101,27 @@ subprojects:
 									 CMSIS_INC="$(CMSIS_INC)"; 			 						\
 		ln -rsf $$proj/src/$$proj.h $(INC)/$$proj.h; 							\
 	done;
+
 # Combine static subproject libraries to single combined library
+# and link includes
 $(COMBINED_LIB): $(LIBCMSIS_LIB) subprojects
 	@mkdir -p $(@D)
+	@mkdir -p $(INC)/CORE
+	@mkdir -p $(INC)/DSP
 	$(AR) -crs $@ $(SUBPROJECT_LIBS) $(LIBCMSIS_LIB)
+	@for path in $(DSP_INCLUDES); do  		\
+		DIR=basename $$path; 				  			\
+		ln -rsf $$path $(INC)/DSP/$$DIR; 		\
+	done;
+	ln -rsf $(CMSIS_CORE_INCLUDES) $(INC)/CORE/$(notdir $(CMSIS_CORE_INCLUDES))
+
 
 $(LIBTEST_LIB):
 	@$(MAKE) -C $(LIBTEST_DIR)
 
 $(LIBCMSIS_LIB):
 	@$(MAKE) -C $(LIBCMSIS_DIR) CC="$(CC)"  AR="$(AR)" CFLAGS="$(CFLAGS)"
+	ln -rsf $$proj/src/$$proj.h $(INC)/$$proj.h;
 
 # Pattern rule for testing subprojects
 test-%: $(LIBTEST_LIB) $(LIBCMSIS_LIB)
