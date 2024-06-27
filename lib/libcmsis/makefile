@@ -36,10 +36,12 @@ all: $(STATIC_LIB)
 
 # Build static library
 $(STATIC_LIB): $(OBJECTS)
+	mkdir -p $(dir $@)
 	$(AR) -rcs $@ $^
 
 # Build shared library
 $(SHARED_LIB): $(OBJECTS)
+	mkdir -p $(dir $@)
 	$(CC) -shared $^ $(CFLAGS) $(INC_FLAGS) -o $@
 
 # Compile each source file to object file

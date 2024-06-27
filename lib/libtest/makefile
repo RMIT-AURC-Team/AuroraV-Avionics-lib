@@ -1,14 +1,12 @@
 # Define project name
 PROJECT_NAME = libtest
 
-CC = gcc
 BIN = bin
-CFLAGS = -Wall -g
 OBJDIR = build
 
 # Define all source files
-SRCS = $(shell find src/ -name "*.c") 
-HDRS = $(shell find src/ -name "*.h")
+SRCS = $(wildcard src/*.c) 
+HDRS = $(wildcard src/*.h)
 LIB = $(BIN)/libtest.a
 
 # Define object files based on source files
@@ -21,7 +19,7 @@ all: $(LIB)
 
 $(LIB): $(OBJS)
 	@mkdir -p $(@D)
-	ar rcs $@ $^
+	$(AR) -rcs $@ $^
 
 # Compile source files into object files
 $(OBJDIR)/%.o: src/%.c $(HDRS)

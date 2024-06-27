@@ -1,43 +1,67 @@
+SUBPROJECTS = membuff quaternion kalmanfilter
 ROOT = $(shell pwd)
+BIN = bin
+INC = inc
 # Normalise path if on windows
 ifeq ($(OS),Windows_NT)
 	ROOT := $(shell cygpath -m $(ROOT))
 endif
 
-BIN = bin
-INC = inc
-SUBPROJECTS = membuff quaternion kalmanfilter
-
 LIBTEST_DIR = $(ROOT)/lib/libtest
 LIBTEST_LIB = $(LIBTEST_DIR)/bin/libtest.a
-LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src
 
 LIBCMSIS_DIR = $(ROOT)/lib/libcmsis
 LIBCMSIS_LIB = $(LIBCMSIS_DIR)/bin/libCMSISDSP.a
-LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
 
-# CC = armclang
-# AR = armar
-# CFLAGS = -mcpu=cortex-m4 		 \
+ifdef TOOLCHAIN
+
+# --- ARMCC ---
+ifeq ($(TOOLCHAIN),armcc)
+CC = armcc
+AR = armar
+CFLAGS = --cpu cortex-m4 	\
+				 --fpu fpv4-sp 		\
+				 -O3
+LIBTEST_ARG = -L--userlibpath=$(LIBTEST_DIR)/bin -L--lib=test -I$(LIBTEST_DIR)/src
+LIBCMSIS_ARG = -L--userlibpath=$(LIBCMSIS_DIR)/bin -L--lib=CMSISDSP
+
+# --- ARMCLANG ---
+else ifeq ($(TOOLCHAIN),armclang)
+CC = armclang
+AR = armar
+CFLAGS = -mcpu=cortex-m4 		 	 \
          -mfloat-abi=hard  		 \
          -mfpu=fpv4-sp-d16 		 \
          -Ofast -ffast-math 	 \
          -DNDEBUG 						 \
          -Wall -Wextra 				 \
          --target=arm-arm-none-eabi
+LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src
+LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
 
-# CC = arm-none-eabi-gcc
-# AR = arm-none-eabi-ar
-# CFLAGS = -mcpu=cortex-m4 		 \
+# --- ARMGCC ---
+else ifeq ($(TOOLCHAIN),armgcc)
+CC = arm-none-eabi-gcc
+AR = arm-none-eabi-ar
+CFLAGS = -mcpu=cortex-m4 		 	 \
          -mfloat-abi=hard  		 \
          -mfpu=fpv4-sp-d16 		 \
          -Ofast -ffast-math 	 \
          -DNDEBUG 						 \
          -Wall -Wextra -Werror \
+LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src
+LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
 
+# --- GCC ---
+else
 CC = gcc
 AR = ar
 CFLAGS := -Wall -g
+LIBTEST_ARG = -L$(LIBTEST_DIR)/bin -ltest -I$(LIBTEST_DIR)/src
+LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
+endif
+
+endif
 
 # Includes for CMSIS lib
 CMSIS_ROOT = $(LIBCMSIS_DIR)/src
@@ -96,9 +120,9 @@ subprojects:
 	@mkdir -p $(INC)
 	@for proj in $(SUBPROJECTS); do 														\
 		make -C $$proj CC="$(CC)"  AR="$(AR)" CFLAGS="$(CFLAGS)" 	\
-									 LIBCMSIS_ARG="$(LIBCMSIS_ARG)"  						\
-									 LIBCMSIS_DIR="$(LIBCMSIS_DIR)"  						\
-									 CMSIS_INC="$(CMSIS_INC)"; 			 						\
+									 						 LIBCMSIS_ARG="$(LIBCMSIS_ARG)" \
+									 						 LIBCMSIS_DIR="$(LIBCMSIS_DIR)" \
+									 						 CMSIS_INC="$(CMSIS_INC)"; 			\
 		ln -rsf $$proj/src/$$proj.h $(INC)/$$proj.h; 							\
 	done;
 
@@ -117,11 +141,10 @@ $(COMBINED_LIB): $(LIBCMSIS_LIB) subprojects
 
 
 $(LIBTEST_LIB):
-	@$(MAKE) -C $(LIBTEST_DIR)
+	@$(MAKE) -C $(LIBTEST_DIR) CC="$(CC)"  AR="$(AR)" CFLAGS="$(CFLAGS) -fPIC"
 
 $(LIBCMSIS_LIB):
 	@$(MAKE) -C $(LIBCMSIS_DIR) CC="$(CC)"  AR="$(AR)" CFLAGS="$(CFLAGS)"
-	ln -rsf $$proj/src/$$proj.h $(INC)/$$proj.h;
 
 # Pattern rule for testing subprojects
 test-%: $(LIBTEST_LIB) $(LIBCMSIS_LIB)
