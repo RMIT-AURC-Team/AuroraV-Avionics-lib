@@ -1,7 +1,6 @@
 # AuroraV Avionics Library
 ![HIVE Aurora V footer](./img/banner.png)
 
-
 ## Table of Contents
 <!-- mtoc-start -->
 
