@@ -1,10 +1,11 @@
 #include "quaternion.h"
 
-void Quaternion_init(Quaternion* q) {
+void Quaternion_init(Quaternion *q) {
   q->w = 1.0;
   q->x = 0.0;
   q->y = 0.0;
   q->z = 0.0;
+  //
   q->fromEuler = Quaternion_fromEuler;
   q->normalise = Quaternion_normalise;
 }
@@ -16,13 +17,13 @@ void Quaternion_init(Quaternion* q) {
  * - Multiplies two quaternions (Hamilton product)
  * - Stores the result in the provided result quaternion
  * =============================================================================== */
-Quaternion Quaternion_mul(Quaternion* q, Quaternion* p) {
+Quaternion Quaternion_mul(Quaternion *q, Quaternion *p) {
   Quaternion result;
   Quaternion_init(&result);
-  result.w = q->w * p->w - q->x * p->x - q->y * p->y - q->z * p->z;
-  result.x = q->w * p->x + q->x * p->w + q->y * p->z - q->z * p->y;
-  result.y = q->w * p->y - q->x * p->z + q->y * p->w + q->z * p->x;
-  result.z = q->w * p->z + q->x * p->y - q->y * p->x + q->z * p->w;
+  result.w = (q->w * p->w) + (-q->x * p->x) + (-q->y * p->y) + (-q->z * p->z);
+  result.x = (q->w * p->x) + (q->x * p->w) + (q->y * p->z) + (-q->z * p->y);
+  result.y = (q->w * p->y) + (-q->x * p->z) + (q->y * p->w) + (q->z * p->x);
+  result.z = (q->w * p->z) + (q->x * p->y) + (-q->y * p->x) + (q->z * p->w);
   return result;
 }
 
@@ -34,11 +35,11 @@ Quaternion Quaternion_mul(Quaternion* q, Quaternion* p) {
  * - Converts angles to radians and halves them
  * - Computes the quaternion components based on the provided angles
  * =============================================================================== */
-void Quaternion_fromEuler(Quaternion* q, double roll, double pitch, double yaw) {
+void Quaternion_fromEuler(Quaternion *q, float roll, float pitch, float yaw) {
   // Convert angles to radians and halve them
-  roll *= 0.5f * M_PI / 180.0f;
+  roll  *= 0.5f * M_PI / 180.0f;
   pitch *= 0.5f * M_PI / 180.0f;
-  yaw *= 0.5f * M_PI / 180.0f;
+  yaw   *= 0.5f * M_PI / 180.0f;
 
   // Calculate the trigonometric functions of half angles
   float cr = cosf(roll);
@@ -59,13 +60,14 @@ void Quaternion_fromEuler(Quaternion* q, double roll, double pitch, double yaw) 
  * NORMALISE
  * - Normalises the quaternion to unit length
  * =============================================================================== */
-void Quaternion_normalise(Quaternion* q) {
+void Quaternion_normalise(Quaternion *q) {
   // Compute the magnitude of the quaternion
-  float magnitude = sqrtf(q->w * q->w + q->x * q->x + q->y * q->y + q->z * q->z);
+  float test = (q->w * q->w) + (q->x * q->x) + (q->y * q->y) + (q->z * q->z);
 
   // Normalise the quaternion components
-  if (magnitude > 1.0f) {
-    float invMag = 1.0f / magnitude;
+  if (test > 1.0f) {
+    float invMag = 1.0f / sqrtf(test);
+    //
     q->w *= invMag;
     q->x *= invMag;
     q->y *= invMag;
