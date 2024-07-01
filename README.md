@@ -1,4 +1,5 @@
 # AuroraV Avionics Library
+![HIVE Aurora V footer](./img/banner.png)
 
 
 ## Table of Contents
@@ -89,3 +90,6 @@ To add a new subproject, follow these steps:
    ```
 
    Since the top level makefile invokes the makefiles of subprojects to compile their source code, tests can easily be implemented beyond the C code examples. An example of this is shown in the ``kalmanfilter`` subproject, using python to execute testing.
+
+![HIVE Aurora V footer](./img/footer.png)
+---
