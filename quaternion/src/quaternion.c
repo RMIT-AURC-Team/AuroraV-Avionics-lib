@@ -80,7 +80,7 @@ void Quaternion_normalise(Quaternion *q) {
  * FROTATEVECTOR3D
  * -
  * =============================================================================== */
-void Quaternion_fRotateVector3D(Quaternion *q, float *v) {
+void Quaternion_fRotateVector3D(Quaternion *q, float *v, float *result) {
   Quaternion qVec, qConj;
 
   // Initialise vector quaternion
@@ -100,7 +100,7 @@ void Quaternion_fRotateVector3D(Quaternion *q, float *v) {
   Quaternion r    = Quaternion_mul(&temp, &qConj);
 
   // Update vector components
-  v[0] = r.x;
-  v[1] = r.y;
-  v[2] = r.z;
+  result[0] = r.x;
+  result[1] = r.y;
+  result[2] = r.z;
 }
