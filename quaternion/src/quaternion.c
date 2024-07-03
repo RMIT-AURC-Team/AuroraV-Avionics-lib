@@ -6,8 +6,9 @@ void Quaternion_init(Quaternion *q) {
   q->y = 0.0;
   q->z = 0.0;
   //
-  q->fromEuler = Quaternion_fromEuler;
-  q->normalise = Quaternion_normalise;
+  q->fromEuler       = Quaternion_fromEuler;
+  q->normalise       = Quaternion_normalise;
+  q->fRotateVector3D = Quaternion_fRotateVector3D;
 }
 
 /********************* STATIC INTERFACE *********************/
@@ -73,4 +74,33 @@ void Quaternion_normalise(Quaternion *q) {
     q->y *= invMag;
     q->z *= invMag;
   }
+}
+
+/* ===============================================================================
+ * FROTATEVECTOR3D
+ * -
+ * =============================================================================== */
+void Quaternion_fRotateVector3D(Quaternion *q, float *v, float *result) {
+  Quaternion qVec, qConj;
+
+  // Initialise vector quaternion
+  qVec.w = 0;
+  qVec.x = v[0];
+  qVec.y = v[1];
+  qVec.z = v[2];
+
+  // Initialise conjugate
+  qConj.w = q->w;
+  qConj.x = -q->x;
+  qConj.y = -q->y;
+  qConj.z = -q->z;
+
+  // Apply quaternion rotation to vector
+  Quaternion temp = Quaternion_mul(q, &qVec);
+  Quaternion r    = Quaternion_mul(&temp, &qConj);
+
+  // Update vector components
+  result[0] = r.x;
+  result[1] = r.y;
+  result[2] = r.z;
 }

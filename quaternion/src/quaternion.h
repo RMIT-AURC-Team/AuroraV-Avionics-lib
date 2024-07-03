@@ -17,11 +17,13 @@ typedef struct Quaternion {
   void (*init)(struct Quaternion *);
   void (*normalise)(struct Quaternion *);
   void (*fromEuler)(struct Quaternion *, float, float, float);
+  void (*fRotateVector3D)(struct Quaternion *, float *, float *);
 } Quaternion;
 
 Quaternion Quaternion_mul(Quaternion *, Quaternion *);
 void Quaternion_init(Quaternion *);
 void Quaternion_normalise(Quaternion *);
 void Quaternion_fromEuler(Quaternion *, float, float, float);
+void Quaternion_fRotateVector3D(Quaternion *, float *, float *);
 
 #endif

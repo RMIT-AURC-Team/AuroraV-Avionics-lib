@@ -26,18 +26,18 @@ LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
          -Wall -Wextra 				 \
          --target=arm-arm-none-eabi
 
-# CC = arm-none-eabi-gcc
-# AR = arm-none-eabi-ar
-# CFLAGS = -mcpu=cortex-m4 		 \
+CC = arm-none-eabi-gcc
+AR = arm-none-eabi-ar
+CFLAGS = -mcpu=cortex-m4 		 \
          -mfloat-abi=hard  		 \
          -mfpu=fpv4-sp-d16 		 \
          -Ofast -ffast-math 	 \
          -DNDEBUG 						 \
          -Wall -Wextra -Werror \
 
-CC = gcc
-AR = ar
-CFLAGS := -Wall -g
+# CC = gcc
+# AR = ar
+# CFLAGS := -Wall -g
 
 # Includes for CMSIS lib
 CMSIS_ROOT = $(LIBCMSIS_DIR)/src
@@ -124,7 +124,6 @@ $(LIBCMSIS_LIB):
 # Pattern rule for testing subprojects
 test-%: $(LIBTEST_LIB) $(LIBCMSIS_LIB)
 	@$(MAKE) -C $* test LIBTEST_ARG="$(LIBTEST_ARG)" LIBTEST_DIR="$(LIBTEST_DIR)" 		\
-											LIBCMSIS_ARG="$(LIBCMSIS_ARG)" LIBCMSIS_DIR="$(LIBCMSIS_DIR)" \
 
 clean-%:
 	@$(MAKE) -C $* clean
