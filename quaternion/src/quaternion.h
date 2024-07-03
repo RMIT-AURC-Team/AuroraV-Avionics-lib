@@ -23,5 +23,6 @@ Quaternion Quaternion_mul(Quaternion *, Quaternion *);
 void Quaternion_init(Quaternion *);
 void Quaternion_normalise(Quaternion *);
 void Quaternion_fromEuler(Quaternion *, float, float, float);
+void Quaternion_fRotateVector3D(Quaternion *, float *);
 
 #endif

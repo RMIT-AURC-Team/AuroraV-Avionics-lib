@@ -101,10 +101,11 @@ subprojects:
 									 CMSIS_INC="$(CMSIS_INC)"; 			 						\
 		ln -rsf $$proj/src/$$proj.h $(INC)/$$proj.h; 							\
 	done;
+
 # Combine static subproject libraries to single combined library
 $(COMBINED_LIB): $(LIBCMSIS_LIB) subprojects
 	@mkdir -p $(@D)
-	$(AR) -crs $@ $(SUBPROJECT_LIBS) $(LIBCMSIS_LIB)
+	$(AR) -crsT $@ $(SUBPROJECT_LIBS) $(LIBCMSIS_LIB)
 
 $(LIBTEST_LIB):
 	@$(MAKE) -C $(LIBTEST_DIR)
