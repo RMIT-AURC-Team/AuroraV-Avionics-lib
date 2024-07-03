@@ -17,6 +17,7 @@ typedef struct Quaternion {
   void (*init)(struct Quaternion *);
   void (*normalise)(struct Quaternion *);
   void (*fromEuler)(struct Quaternion *, float, float, float);
+  void (*fRotateVector3D)(struct Quaternion *, float *);
 } Quaternion;
 
 Quaternion Quaternion_mul(Quaternion *, Quaternion *);

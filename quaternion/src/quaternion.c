@@ -6,8 +6,9 @@ void Quaternion_init(Quaternion *q) {
   q->y = 0.0;
   q->z = 0.0;
   //
-  q->fromEuler = Quaternion_fromEuler;
-  q->normalise = Quaternion_normalise;
+  q->fromEuler       = Quaternion_fromEuler;
+  q->normalise       = Quaternion_normalise;
+  q->fRotateVector3D = Quaternion_fRotateVector3D;
 }
 
 /********************* STATIC INTERFACE *********************/
