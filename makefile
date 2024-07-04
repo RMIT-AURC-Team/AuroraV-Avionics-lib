@@ -16,28 +16,39 @@ LIBCMSIS_DIR = $(ROOT)/lib/libcmsis
 LIBCMSIS_LIB = $(LIBCMSIS_DIR)/bin/libCMSISDSP.a
 LIBCMSIS_ARG = -L$(LIBCMSIS_DIR)/bin -lCMSISDSP
 
-# CC = armclang
-# AR = armar
-# CFLAGS = -mcpu=cortex-m4 		 \
-         -mfloat-abi=hard  		 \
-         -mfpu=fpv4-sp-d16 		 \
-         -Ofast -ffast-math 	 \
-         -DNDEBUG 						 \
-         -Wall -Wextra 				 \
-         --target=arm-arm-none-eabi
+ifdef TOOLCHAIN
 
+# --- ARMCLANG ---
+ifeq ($(TOOLCHAIN), armclang)
+CC = armclang
+AR = armar
+CFLAGS = -mcpu=cortex-m4 		 \
+       -mfloat-abi=hard  		 \
+       -mfpu=fpv4-sp-d16 		 \
+       -Ofast -ffast-math 	 \
+       -DNDEBUG 						 \
+       -Wall -Wextra 				 \
+       --target=arm-arm-none-eabi
+
+# ---ARMGCC ---
+else ifeq ($(TOOLCHAIN), armgcc)
 CC = arm-none-eabi-gcc
 AR = arm-none-eabi-ar
-CFLAGS = -mcpu=cortex-m4 		 \
+CFLAGS = -mcpu=cortex-m4 		 	 \
          -mfloat-abi=hard  		 \
          -mfpu=fpv4-sp-d16 		 \
          -Ofast -ffast-math 	 \
          -DNDEBUG 						 \
          -Wall -Wextra -Werror \
 
-# CC = gcc
-# AR = ar
-# CFLAGS := -Wall -g
+# --- GCC ---
+else
+CC = gcc
+AR = ar
+CFLAGS := -Wall -g
+endif
+
+endif
 
 # Includes for CMSIS lib
 CMSIS_ROOT = $(LIBCMSIS_DIR)/src
