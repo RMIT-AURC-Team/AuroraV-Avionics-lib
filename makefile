@@ -69,9 +69,18 @@ SUBPROJECT_LIBS := $(foreach proj,$(SUBPROJECTS),$(proj)/bin/lib$(proj).a)
 COMBINED_LIB = $(BIN)/libavionics.a
 
 # Default target
-.PHONY: all subprojects test clean
+.PHONY: all thin subprojects test clean
 
-all: $(COMBINED_LIB)
+all: $(INC)
+	rm -rf $(BIN)
+	mkdir -p $(BIN)
+	$(AR) -crsT $(COMBINED_LIB) $(SUBPROJECT_LIBS) $(LIBCMSIS_LIB) 
+	echo -e 'create $(COMBINED_LIB)\naddlib $(COMBINED_LIB)\nsave\nend' | ar -M
+
+thin: $(INC)
+	rm -rf $(BIN)
+	mkdir -p $(BIN)
+	$(AR) -crsT $(COMBINED_LIB) $(SUBPROJECT_LIBS) $(LIBCMSIS_LIB) 
 
 test: $(LIBCMSIS_LIB) $(LIBTEST_LIB)
 	@echo "$(CFLAGS)"
@@ -100,7 +109,7 @@ test: $(LIBCMSIS_LIB) $(LIBTEST_LIB)
 	echo "=========================="; 
 
 clean: clean-libtest clean-libcmsis $(patsubst %,clean-%,$(SUBPROJECTS))
-	rm -rf $(BIN)/* $(INC)/*
+	rm -rf $(BIN) $(INC)
 
 # Special rule for building subprojects
 subprojects:
@@ -115,11 +124,25 @@ subprojects:
 
 # Combine static subproject libraries to single combined library
 # and link includes
+$(INC): $(LIBCMSIS_LIB) subprojects
+	@mkdir -p $@
+	@mkdir -p $@/CORE
+	@mkdir -p $@/DSP
+	# Link in includes to /inc
+	@for path in $(DSP_INCLUDES); do  		\
+		DIR=basename $$path; 				  			\
+		ln -rsf $$path $(INC)/DSP/$$DIR; 		\
+	done;
+	ln -rsf $(CMSIS_CORE_INCLUDES) $(INC)/CORE/$(notdir $(CMSIS_CORE_INCLUDES))
+
+# Combine static subproject libraries to single combined library
+# and link includes
 $(COMBINED_LIB): $(LIBCMSIS_LIB) subprojects
 	@mkdir -p $(@D)
 	@mkdir -p $(INC)/CORE
 	@mkdir -p $(INC)/DSP
 	$(AR) -crsT $@ $(SUBPROJECT_LIBS) $(LIBCMSIS_LIB)
+	# Link in includes to /inc
 	@for path in $(DSP_INCLUDES); do  		\
 		DIR=basename $$path; 				  			\
 		ln -rsf $$path $(INC)/DSP/$$DIR; 		\
