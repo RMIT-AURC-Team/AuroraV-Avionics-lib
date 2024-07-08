@@ -133,7 +133,10 @@ $(INC): $(LIBCMSIS_LIB) subprojects
 		DIR=basename $$path; 				  			\
 		ln -rsf $$path $(INC)/DSP/$$DIR; 		\
 	done;
-	ln -rsf $(CMSIS_CORE_INCLUDES) $(INC)/CORE/$(notdir $(CMSIS_CORE_INCLUDES))
+	@for path in $(CMSIS_CORE_INCLUDES); do \
+		DIR=basename $$path; 				  				\
+		ln -rsf $$path $(INC)/DSP/$$DIR; 			\
+	done;
 
 # Combine static subproject libraries to single combined library
 # and link includes
